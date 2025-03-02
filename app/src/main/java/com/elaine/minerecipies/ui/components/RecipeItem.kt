@@ -1,20 +1,25 @@
 package com.elaine.minerecipies.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.elaine.minerecipies.data.Items
 import com.elaine.minerecipies.data.Recipe
 
 
@@ -27,7 +32,7 @@ fun RecipeItem(recipe: Recipe) {
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -38,7 +43,7 @@ fun RecipeItem(recipe: Recipe) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            //TODO crafting grid display
+            CraftingGrid(recipe.recipe as List<String?>)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -48,8 +53,33 @@ fun RecipeItem(recipe: Recipe) {
         }
     }
 }
-
+//Crafting bench
 @Composable
-fun CraftingGrid(recipeItems: List<String>){
+fun CraftingGrid(recipeItems: List<String?>){
+    val gridSize = 3  // 3x3 Crafting Grid
 
+    Column {
+        for (i in 0 until gridSize) {
+            Row {
+                for (j in 0 until gridSize) {
+                    val index = i * gridSize + j
+                    val itemName = if (index < recipeItems.size) recipeItems[index] else ""
+
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.LightGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (itemName != null) {
+                            Text(text = itemName, fontSize = 12.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+    }
 }
