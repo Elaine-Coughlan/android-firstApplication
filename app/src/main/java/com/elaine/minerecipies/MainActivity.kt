@@ -1,6 +1,7 @@
 package com.elaine.minerecipies
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,11 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.elaine.minerecipies.data.Items
 import com.elaine.minerecipies.data.Recipe
+import com.elaine.minerecipies.ui.screens.RecipesScreen
 import com.elaine.minerecipies.ui.theme.MineRecipiesTheme
 import com.elaine.minerecipies.util.loadItems
 import com.elaine.minerecipies.util.loadRecipes
@@ -34,12 +36,13 @@ import com.elaine.minerecipies.util.loadRecipes
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()//Top bar disappears (Clock, wifi, battery)
+        enableEdgeToEdge()
         setContent {
             MineRecipiesTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Recipes(
-                        modifier = Modifier.padding(innerPadding)
+                Scaffold(modifier = Modifier) { innerPadding ->
+                    RecipesScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        context = this
                     )
                 }
             }
@@ -47,45 +50,5 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Recipes(modifier: Modifier = Modifier){
-    val context = LocalContext.current
-    val recipes = remember { loadRecipes(context) }
-    val items = remember { loadItems(context) }
-
-    LazyColumn (modifier = modifier){
-        items(recipes){recipe ->
-            val item = items.find{
-                it.name == recipe.item
-            }
-            RecipeItem(recipe, item)
-        }
-    }
-}
 
 
-
-@Composable
-fun RecipeItem(recipe: Recipe, item: Items?) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        //elevation = 4.dp
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            item?.let {
-                /**Image(
-                    painter = rememberImagePainter(it.image),
-                    contentDescription = it.name,
-                    modifier = Modifier.size(64.dp)
-                )*/
-                Text(text = it.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(text = it.description, fontSize = 14.sp)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Quantity: ${recipe.quantity}")
-            Text(text = "Shapeless: ${recipe.shapeless}")
-        }
-    }
-}
