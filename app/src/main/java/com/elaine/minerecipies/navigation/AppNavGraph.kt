@@ -24,7 +24,7 @@ fun NavHostProvider(
         modifier = Modifier.padding(paddingValues)
     ) {
         composable(route = Recipes.route) { RecipesScreen(modifier, LocalContext.current) }
-        composable(route = Inventory.route) { InventoryScreen(modifier) }
+        composable(route = Inventory.route) { InventoryScreen() }
     }
 }
 
