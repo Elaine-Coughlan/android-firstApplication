@@ -1,6 +1,7 @@
 package com.elaine.minerecipies.util
 
 import android.content.Context
+import com.elaine.minerecipies.data.Blocks.Blocks
 import com.elaine.minerecipies.data.Items
 import com.elaine.minerecipies.data.Recipe
 import com.google.gson.Gson
@@ -36,5 +37,11 @@ fun ensureGridSize(recipeList: List<String?>, size: Int): List<String> {
 fun loadItems(context: Context): List<Items> {
     val json = context.assets.open("items.json").bufferedReader().use { it.readText() }
     val type = object : TypeToken<List<Items>>() {}.type
+    return Gson().fromJson(json, type)
+}
+
+fun loadBlocks(context: Context): List<Blocks> {
+    val json = context.assets.open("blocks.json").bufferedReader().use { it.readText() }
+    val type = object : TypeToken<List<Blocks>>() {}.type
     return Gson().fromJson(json, type)
 }
