@@ -7,9 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.elaine.minerecipies.data.Blocks.Blocks
 import com.elaine.minerecipies.data.InventoryItem
 import com.elaine.minerecipies.data.Items
-import com.elaine.minerecipies.util.loadItems
-import com.elaine.minerecipies.util.loadBlocks
-import com.elaine.minerecipies.util.loadRecipes
+import com.elaine.minerecipies.data.api.loadItems
+import com.elaine.minerecipies.data.api.loadBlocks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

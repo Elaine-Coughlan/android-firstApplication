@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.elaine.minerecipies.data.Recipe
-import com.elaine.minerecipies.util.loadRecipes
+import com.elaine.minerecipies.data.api.loadRecipes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

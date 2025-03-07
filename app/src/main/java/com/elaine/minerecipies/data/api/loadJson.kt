@@ -1,4 +1,4 @@
-package com.elaine.minerecipies.util
+package com.elaine.minerecipies.data.api
 
 import android.content.Context
 import com.elaine.minerecipies.data.Blocks.Blocks

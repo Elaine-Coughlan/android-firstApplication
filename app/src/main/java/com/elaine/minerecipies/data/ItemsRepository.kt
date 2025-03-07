@@ -1,7 +1,7 @@
 package com.elaine.minerecipies.data
 
 import android.content.Context
-import com.elaine.minerecipies.util.loadItems
+import com.elaine.minerecipies.data.api.loadItems
 
 class ItemsRepository(private val context: Context) {
 
