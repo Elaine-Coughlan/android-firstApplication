@@ -5,15 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.elaine.minerecipies.data.Blocks.Blocks
-import com.elaine.minerecipies.data.InventoryItem
 import com.elaine.minerecipies.data.Items
+import com.elaine.minerecipies.data.database.InventoryDatabase
 import com.elaine.minerecipies.data.api.loadItems
 import com.elaine.minerecipies.data.api.loadBlocks
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.elaine.minerecipies.data.database.InventoryItem
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class InventoryViewModel(context: Context) : ViewModel() {
+
+    private val inventoryDao = InventoryDatabase.getDatabase(context).inventoryDao()
 
     private val _inventoryList = MutableStateFlow<List<InventoryItem>>(emptyList())
     val inventoryList: StateFlow<List<InventoryItem>> = _inventoryList
@@ -23,24 +25,28 @@ class InventoryViewModel(context: Context) : ViewModel() {
 
     init {
         viewModelScope.launch {
-
+            inventoryDao.getAllItems().collect {
+                _inventoryList.value = it
+            }
         }
     }
 
     fun addToInventory(name: String, quantity: Int, type: String) {
-        val existingItem = _inventoryList.value.find { it.name == name }
-
-        _inventoryList.value = if (existingItem != null) {
-            _inventoryList.value.map {
-                if (it.name == name) it.copy(quantity = it.quantity + quantity) else it
+        viewModelScope.launch {
+            val existingItem = inventoryDao.getItemByName(name)
+            if (existingItem != null) {
+                val updatedItem = existingItem.copy(quantity = existingItem.quantity + quantity)
+                inventoryDao.insertItem(updatedItem)
+            } else {
+                inventoryDao.insertItem(InventoryItem(name = name, quantity = quantity, type = type))
             }
-        } else {
-            _inventoryList.value + InventoryItem(name = name, quantity = quantity, type = type)
         }
     }
 
     fun removeFromInventory(item: InventoryItem) {
-        _inventoryList.value = _inventoryList.value.filter { it.name != item.name }
+        viewModelScope.launch {
+            inventoryDao.deleteItem(item)
+        }
     }
 
     class InventoryViewModelFactory(private val context: Context) : ViewModelProvider.Factory {

@@ -11,7 +11,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elaine.minerecipies.ui.components.AutoCompleteTextField
 import com.elaine.minerecipies.ui.components.InventoryItemRow
+import com.elaine.minerecipies.ui.components.RadioButtonSingleSelection
 import com.elaine.minerecipies.viewmodel.InventoryViewModel
+
 
 
 @Composable
@@ -22,21 +24,16 @@ fun InventoryScreen() {
     )
 
     val inventoryList by viewModel.inventoryList.collectAsState()
-    val isItemSelected = remember { mutableStateOf(true) }
+    val selectedType = remember { mutableStateOf("Item") }
     val selectedName = remember { mutableStateOf("") }
     val quantity = remember { mutableStateOf("1") }
+    val manualEntry = remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Row {
-            Button(onClick = { isItemSelected.value = true }) {
-                Text("Items")
-            }
-            Button(onClick = { isItemSelected.value = false }) {
-                Text("Blocks")
-            }
-        }
+        Text("Select Type:", style = MaterialTheme.typography.titleMedium)
+        RadioButtonSingleSelection()
 
-        val options = if (isItemSelected.value) {
+        val options = if (selectedType.value == "Item") {
             viewModel.availableItems.map { it.name }
         } else {
             viewModel.availableBlocks.map { it.name }
@@ -49,6 +46,14 @@ fun InventoryScreen() {
         )
 
         TextField(
+            value = manualEntry.value,
+            onValueChange = { manualEntry.value = it },
+            label = { Text("Or enter item manually") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        TextField(
             value = quantity.value,
             onValueChange = { quantity.value = it },
             label = { Text("Quantity") },
@@ -57,17 +62,13 @@ fun InventoryScreen() {
         )
 
         Button(onClick = {
+            val itemName = if (manualEntry.value.isNotEmpty()) manualEntry.value else selectedName.value
             val qty = quantity.value.toIntOrNull() ?: 1
-            if (selectedName.value.isNotEmpty()) {
-                // Add to inventory
-                viewModel.addToInventory(
-                    name = selectedName.value,
-                    quantity = qty,
-                    type = if (isItemSelected.value) "Item" else "Block"
-                )
-
-
-
+            if (itemName.isNotEmpty()) {
+                viewModel.addToInventory(name = itemName, quantity = qty, type = selectedType.value)
+                manualEntry.value = ""
+                selectedName.value = ""
+                quantity.value = "1"
             }
         }) {
             Text("Add to Inventory")
@@ -80,6 +81,7 @@ fun InventoryScreen() {
         }
     }
 }
+
 
 
 

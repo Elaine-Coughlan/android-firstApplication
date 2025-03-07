@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.elaine.minerecipies.data.InventoryItem
+import com.elaine.minerecipies.data.database.InventoryItem
 
 @Composable
 fun InventoryItemRow(item: InventoryItem, onDelete: () -> Unit) {
