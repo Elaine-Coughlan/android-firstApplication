@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
             MineRecipiesTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = darkColorScheme().onBackground
                 ) {
                     MainApp()
                 }

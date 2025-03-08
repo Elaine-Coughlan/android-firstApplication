@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.elaine.minerecipies.ui.theme.MineRecipiesTheme
 
 
 @Composable
@@ -20,38 +21,41 @@ fun AutoCompleteTextField(
     selectedValue: String,
     onValueChange: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf(selectedValue) }
+    MineRecipiesTheme {
 
-    Box {
-        TextField(
-            value = searchText,
-            onValueChange = {
-                searchText = it
-                expanded = it.isNotEmpty()
-                onValueChange(it)
-            },
-            label = { Text("Search") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
+        var expanded by remember { mutableStateOf(false) }
+        var searchText by remember { mutableStateOf(selectedValue) }
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.filter { it.contains(searchText, ignoreCase = true) }
-                .take(5)
-                .forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            searchText = option
-                            onValueChange(option)
-                            expanded = false
-                        }
-                    )
-                }
+        Box {
+            TextField(
+                value = searchText,
+                onValueChange = {
+                    searchText = it
+                    expanded = it.isNotEmpty()
+                    onValueChange(it)
+                },
+                label = { Text("Search") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.filter { it.contains(searchText, ignoreCase = true) }
+                    .take(5)
+                    .forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                searchText = option
+                                onValueChange(option)
+                                expanded = false
+                            }
+                        )
+                    }
+            }
         }
     }
 }

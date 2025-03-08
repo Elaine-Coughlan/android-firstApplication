@@ -9,34 +9,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.elaine.minerecipies.navigation.allDestinations
+import com.elaine.minerecipies.ui.theme.MineRecipiesTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppDrawer(navController: NavHostController, drawerState: DrawerState, content: @Composable () -> Unit) {
-    val scope = rememberCoroutineScope()
+    MineRecipiesTheme {
+        val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Minecraft Recipes", style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(16.dp))
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Minecraft Recipes", style = MaterialTheme.typography.titleLarge)
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    allDestinations.forEach { destination ->
-                        NavigationDrawerItem(
-                            label = { Text(destination.label) },
-                            selected = false,
-                            onClick = {
-                                navController.navigate(destination.route)
-                                scope.launch { drawerState.close() }
-                            }
-                        )
+                        allDestinations.forEach { destination ->
+                            NavigationDrawerItem(
+                                label = { Text(destination.label) },
+                                selected = false,
+                                onClick = {
+                                    navController.navigate(destination.route)
+                                    scope.launch { drawerState.close() }
+                                }
+                            )
+                        }
                     }
                 }
             }
+        ) {
+            content()
         }
-    ) {
-        content()
     }
 }
