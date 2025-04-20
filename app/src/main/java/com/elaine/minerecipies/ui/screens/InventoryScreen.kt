@@ -7,10 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elaine.minerecipies.ui.components.AutoCompleteTextField
 import com.elaine.minerecipies.ui.components.InventoryItemRow
+import com.elaine.minerecipies.ui.theme.MineRecipiesTheme
 import com.elaine.minerecipies.viewmodel.InventoryViewModel
 
 
@@ -65,9 +67,6 @@ fun InventoryScreen() {
                     quantity = qty,
                     type = if (isItemSelected.value) "Item" else "Block"
                 )
-
-
-
             }
         }) {
             Text("Add to Inventory")
@@ -78,6 +77,13 @@ fun InventoryScreen() {
                 InventoryItemRow(item, onDelete = { viewModel.removeFromInventory(item) })
             }
         }
+    }
+}
+@Composable
+@Preview
+fun ShowScreen(){
+    MineRecipiesTheme {
+        InventoryScreen()
     }
 }
 

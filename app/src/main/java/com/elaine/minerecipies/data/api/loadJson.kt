@@ -41,7 +41,12 @@ fun loadItems(context: Context): List<Items> {
 }
 
 fun loadBlocks(context: Context): List<Blocks> {
-    val json = context.assets.open("blocks.json").bufferedReader().use { it.readText() }
-    val type = object : TypeToken<List<Blocks>>() {}.type
-    return Gson().fromJson(json, type)
+    return try {
+        val json = context.assets.open("blocks.json").bufferedReader().use { it.readText() }
+        val type = object : TypeToken<List<Blocks>>() {}.type
+        Gson().fromJson(json, type)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        emptyList() // Return empty list instead of crashing
+    }
 }
