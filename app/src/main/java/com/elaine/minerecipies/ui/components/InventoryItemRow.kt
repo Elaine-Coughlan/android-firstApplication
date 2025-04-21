@@ -11,14 +11,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.elaine.minerecipies.data.InventoryItem
+import com.elaine.minerecipies.data.database.InventoryItem
+import com.elaine.minerecipies.ui.theme.MineRecipiesTheme
 
 @Composable
 fun InventoryItemRow(item: InventoryItem, onDelete: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-        Text(text = "${item.name} (${item.quantity})", modifier = Modifier.weight(1f))
-        IconButton(onClick = onDelete) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+    MineRecipiesTheme {
+        Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Text(text = "${item.name} (${item.quantity})", modifier = Modifier.weight(1f))
+            IconButton(onClick = onDelete) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+            }
         }
     }
 }
