@@ -40,7 +40,7 @@ fun NavHostProvider(
         startDestination = Recipes.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(route = Recipes.route) { RecipesScreen(modifier, LocalContext.current) }
+        composable(route = Recipes.route) { RecipesScreen(LocalContext.current) }
         composable(route = Inventory.route) { InventoryScreen() }
         composable(route = RecipeRecommendations.route) {
             val lifecycleOwner = LocalContext.current as LifecycleOwner

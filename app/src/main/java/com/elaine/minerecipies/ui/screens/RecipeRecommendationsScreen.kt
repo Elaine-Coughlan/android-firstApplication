@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.elaine.minerecipies.data.Recipe
+import com.elaine.minerecipies.data.database.InventoryItem
 import com.elaine.minerecipies.viewmodel.InventoryViewModel
 import com.elaine.minerecipies.viewmodel.RecipeRecommendationsViewModel
 import com.elaine.minerecipies.viewmodel.RecipesViewModel
@@ -245,7 +246,7 @@ fun FilterSection(
 @Composable
 fun RecipeRecommendationCard(
     recipe: Recipe,
-    inventory: List<com.elaine.minerecipies.data.InventoryItem>,
+    inventory: List<InventoryItem>,
     recipesViewModel: RecipesViewModel
 ) {
     val missingIngredients = recipesViewModel.getMissingIngredients(recipe, inventory)

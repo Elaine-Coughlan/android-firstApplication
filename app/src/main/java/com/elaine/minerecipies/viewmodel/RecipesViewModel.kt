@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.elaine.minerecipies.data.Blocks.Blocks
-import com.elaine.minerecipies.data.InventoryItem
+import com.elaine.minerecipies.data.database.InventoryItem
 import com.elaine.minerecipies.data.Items
 import com.elaine.minerecipies.data.Recipe
 import com.elaine.minerecipies.data.RecipeRecommendation

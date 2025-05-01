@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.kt.coil.compose)
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     //Room
     implementation(libs.androidx.room.runtime)

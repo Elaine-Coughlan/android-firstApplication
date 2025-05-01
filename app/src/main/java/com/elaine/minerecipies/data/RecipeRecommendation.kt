@@ -1,5 +1,7 @@
 package com.elaine.minerecipies.data
 
+import com.elaine.minerecipies.data.database.InventoryItem
+
 class RecipeRecommendation {
 
 
