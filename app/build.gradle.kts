@@ -1,8 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.android.ksp)
+
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -41,7 +45,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,18 +53,52 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.gson)
-    implementation(libs.androidx.core.splashscreen)
+
+    implementation(libs.timber)
+    implementation(libs.numberPicker)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.coil.kt.coil.compose)
-    implementation ("com.github.bumptech.glide:glide:4.15.1")
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    //Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.firestore)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    //ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+
     //Room
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.ui.text.google.fonts)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.gson)
+
+    //Google Services
+    implementation(libs.play.services.auth)
+
+    //Firebase
+    implementation(libs.firebase.auth)
+
+    //FireStore
+    implementation (libs.firebase.firestore)
+    implementation(libs.coil.compose)
+
+    //SplashScreen
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+
+    //Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

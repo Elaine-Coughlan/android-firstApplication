@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "14304235642",
+    "project_id": "minerecipies-6c51a",
+    "storage_bucket": "minerecipies-6c51a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14304235642:android:6e77a9b6e974c0b4a66bc3",
+        "android_client_info": {
+          "package_name": "com.elaine.minerecipies"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRcLHn-Y680TwarQYb_fbfWvXI29GbkqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
