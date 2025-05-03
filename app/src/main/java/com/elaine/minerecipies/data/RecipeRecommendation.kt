@@ -4,13 +4,38 @@ import com.elaine.minerecipies.data.database.InventoryItem
 
 class RecipeRecommendation {
 
-
     fun findCraftableRecipes(recipes: List<Recipe>, inventory: List<InventoryItem>): List<Recipe> {
         return recipes.filter { recipe ->
             canCraftRecipe(recipe, inventory)
         }
     }
 
+    private fun normalizeIngredientName(name: String): String {
+        // Normalize by converting to lowercase and removing extra spaces
+        return name.lowercase().trim()
+            .replace("accia", "acacia") // Fix potential typo
+            .replace("wood planks", "planks") // Normalize wood planks terminology
+            .replace("wooden planks", "planks") // Normalize wood planks terminology
+    }
+
+    private fun findMatchingInventoryItem(
+        ingredient: String,
+        inventory: List<InventoryItem>
+    ): InventoryItem? {
+        val normalizedIngredient = normalizeIngredientName(ingredient)
+
+        // First try exact match with normalization
+        inventory.find { normalizeIngredientName(it.name) == normalizedIngredient }?.let {
+            return it
+        }
+
+        // If no exact match, try contains for partial matches
+        // This handles cases like "Oak Planks" matching "Planks" in recipes
+        return inventory.find {
+            normalizeIngredientName(it.name).contains(normalizedIngredient) ||
+                    normalizedIngredient.contains(normalizeIngredientName(it.name))
+        }
+    }
 
     private fun canCraftRecipe(recipe: Recipe, inventory: List<InventoryItem>): Boolean {
         // Count how many of each ingredient is needed
@@ -18,11 +43,10 @@ class RecipeRecommendation {
 
         // Check if we have enough of each ingredient in inventory
         return ingredientCounts.all { (ingredient, count) ->
-            val inventoryItem = inventory.find { it.name == ingredient }
+            val inventoryItem = findMatchingInventoryItem(ingredient, inventory)
             inventoryItem != null && inventoryItem.quantity >= count
         }
     }
-
 
     fun filterRecipesByType(recipes: List<Recipe>, type: String): List<Recipe> {
         if (type.equals("All", ignoreCase = true)) {
@@ -35,7 +59,6 @@ class RecipeRecommendation {
         }
     }
 
-
     fun sortRecipesByComplexity(recipes: List<Recipe>, ascending: Boolean = true): List<Recipe> {
         return if (ascending) {
             recipes.sortedBy { it.recipe.size }
@@ -43,7 +66,6 @@ class RecipeRecommendation {
             recipes.sortedByDescending { it.recipe.size }
         }
     }
-
 
     fun sortRecipesByResourcesNeeded(recipes: List<Recipe>, ascending: Boolean = true): List<Recipe> {
         return if (ascending) {
@@ -53,7 +75,6 @@ class RecipeRecommendation {
             recipes.sortedByDescending { it.recipe.distinct().size }
         }
     }
-
 
     fun findAlmostCraftableRecipes(
         recipes: List<Recipe>,
@@ -66,7 +87,6 @@ class RecipeRecommendation {
         }
     }
 
-
     fun getMissingIngredients(recipe: Recipe, inventory: List<InventoryItem>): List<Pair<String, Int>> {
         val missingIngredients = mutableListOf<Pair<String, Int>>()
 
@@ -75,7 +95,7 @@ class RecipeRecommendation {
 
         // Check each ingredient against inventory
         ingredientCounts.forEach { (ingredient, requiredCount) ->
-            val inventoryItem = inventory.find { it.name == ingredient }
+            val inventoryItem = findMatchingInventoryItem(ingredient, inventory)
             val availableCount = inventoryItem?.quantity ?: 0
 
             if (availableCount < requiredCount) {
@@ -85,7 +105,6 @@ class RecipeRecommendation {
 
         return missingIngredients
     }
-
 
     fun getRecipeType(recipe: Recipe): String {
         val item = recipe.item.lowercase()
@@ -106,4 +125,3 @@ class RecipeRecommendation {
         }
     }
 }
-

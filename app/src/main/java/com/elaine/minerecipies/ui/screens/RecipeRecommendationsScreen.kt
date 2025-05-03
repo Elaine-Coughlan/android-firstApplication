@@ -333,7 +333,8 @@ fun RecipeRecommendationCard(
             val ingredientCounts = recipe.recipe.groupingBy { it }.eachCount()
 
             ingredientCounts.forEach { (ingredient, count) ->
-                val inventoryItem = inventory.find { it.name == ingredient }
+                // Use the same normalized matching as in RecipeRecommendation
+                val inventoryItem = findMatchingInventoryItem(ingredient, inventory)
                 val available = inventoryItem?.quantity ?: 0
                 val isEnough = available >= count
 
@@ -378,5 +379,35 @@ fun RecipeRecommendationCard(
                 }
             }
         }
+    }
+}
+
+/**
+ * Helper functions: Less exact matches
+**/
+private fun normalizeIngredientName(name: String): String {
+    // Normalize by converting to lowercase and removing extra spaces
+    return name.lowercase().trim()
+        .replace("accia", "acacia") // Fix potential typo
+        .replace("wood planks", "planks") // Normalize wood planks terminology
+        .replace("wooden planks", "planks") // Normalize wood planks terminology
+}
+
+private fun findMatchingInventoryItem(
+    ingredient: String,
+    inventory: List<InventoryItem>
+): InventoryItem? {
+    val normalizedIngredient = normalizeIngredientName(ingredient)
+
+    // First try exact match with normalization
+    inventory.find { normalizeIngredientName(it.name) == normalizedIngredient }?.let {
+        return it
+    }
+
+    // If no exact match, try contains for partial matches
+    // This handles cases like "Oak Planks" matching "Planks" in recipes
+    return inventory.find {
+        normalizeIngredientName(it.name).contains(normalizedIngredient) ||
+                normalizedIngredient.contains(normalizeIngredientName(it.name))
     }
 }
