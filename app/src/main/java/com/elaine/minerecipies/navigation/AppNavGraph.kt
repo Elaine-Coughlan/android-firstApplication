@@ -1,3 +1,4 @@
+
 package com.elaine.minerecipies.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
@@ -7,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 
 
@@ -48,8 +49,11 @@ fun AppNavGraph(
             paddingValues = paddingValues,
             authService = authService
         )
+
     }
+
 }
+
 @Composable
 fun NavHostProvider(
     modifier: Modifier,
@@ -59,7 +63,6 @@ fun NavHostProvider(
 ) {
     // Create a state that will be updated when authentication changes
     val authState = remember { mutableStateOf(authService.isUserAuthenticatedInFirebase) }
-
     // Add an effect that updates the state when auth changes
     LaunchedEffect(Unit) {
         // Set up an observer for auth changes
@@ -70,7 +73,6 @@ fun NavHostProvider(
     LaunchedEffect(navController.currentBackStackEntry) {
         authState.value = authService.isUserAuthenticatedInFirebase
     }
-
     NavHost(
         navController = navController,
         startDestination = Recipes.route,
@@ -81,7 +83,6 @@ fun NavHostProvider(
             val context = LocalContext.current
             RecipesScreen(context)
         }
-
         // Authentication screens
         composable(route = Login.route) {
             LoginScreen(
@@ -95,6 +96,8 @@ fun NavHostProvider(
                 }
             )
         }
+
+
 
         composable(route = Register.route) {
             RegisterScreen(
@@ -123,25 +126,25 @@ fun NavHostProvider(
                 }
             }
         }
-
         composable(route = RecipeRecommendations.route) {
             // Use the state variable instead of direct call
             if (authState.value) {
-                val context = LocalContext.current
-                val lifecycleOwner = context as LifecycleOwner
-
                 val inventoryViewModel: InventoryViewModel = hiltViewModel()
                 val recipesViewModel: RecipesViewModel = hiltViewModel()
-                val recommendationsViewModel = RecipeRecommendationsViewModel(
+
+                // Create RecipeRecommendationsViewModel using Factory
+                val factory = RecipeRecommendationsViewModel.Factory(
                     inventoryViewModel = inventoryViewModel,
-                    recipesViewModel = recipesViewModel,
-                    lifecycleOwner = lifecycleOwner
+                    recipesViewModel = recipesViewModel
                 )
 
+
+
+                val recommendationsViewModel: RecipeRecommendationsViewModel = viewModel(factory = factory)
                 RecipeRecommendationsScreen(
                     recommendationsViewmodel = recommendationsViewModel,
                     recipesViewModel = recipesViewModel,
-                    inventoryViewModel = inventoryViewModel,
+                    inventoryViewModel = inventoryViewModel
                 )
             } else {
                 // Redirect to login if not logged in

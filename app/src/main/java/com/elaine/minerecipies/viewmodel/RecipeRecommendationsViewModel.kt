@@ -1,20 +1,22 @@
 package com.elaine.minerecipies.viewmodel
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collectLatest
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+// Remove @HiltViewModel annotation
 class RecipeRecommendationsViewModel(
     private val inventoryViewModel: InventoryViewModel,
-    private val recipesViewModel: RecipesViewModel,
-    lifecycleOwner: LifecycleOwner
-) {
+    private val recipesViewModel: RecipesViewModel
+) : ViewModel() {
 
     init {
         // Connect inventory updates to recipe recommendations
-        lifecycleOwner.lifecycleScope.launch {
-            inventoryViewModel.inventoryList.collectLatest { inventory ->
+        viewModelScope.launch {
+            inventoryViewModel.inventoryList.collect { inventory ->
                 recipesViewModel.updateRecommendedRecipes(inventory)
             }
         }
@@ -43,7 +45,20 @@ class RecipeRecommendationsViewModel(
         recipesViewModel.updateRecommendedRecipes(inventoryViewModel.inventoryList.value)
     }
 
-
-
-
+    // Add a Factory class
+    class Factory(
+        private val inventoryViewModel: InventoryViewModel,
+        private val recipesViewModel: RecipesViewModel
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(RecipeRecommendationsViewModel::class.java)) {
+                return RecipeRecommendationsViewModel(
+                    inventoryViewModel,
+                    recipesViewModel
+                ) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
 }

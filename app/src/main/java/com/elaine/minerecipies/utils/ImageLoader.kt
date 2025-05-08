@@ -92,14 +92,23 @@ object ImageLoader {
         )
     }
 
+    // Update in ImageLoader.kt
     @Composable
     fun ItemImage(imagePath: String, modifier: Modifier = Modifier) {
         val context = LocalContext.current
 
+        // Check if asset exists, use a default if not
+        val finalPath = try {
+            context.assets.open(imagePath).close()
+            imagePath
+        } catch (e: Exception) {
+            "items/unknown_item.png"  // Default fallback image
+        }
+
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context)
-                .data("file:///android_asset/$imagePath")
-                .size(64, 64) // Smaller size for items
+                .data("file:///android_asset/$finalPath")
+                .size(64, 64)
                 .scale(Scale.FIT)
                 .crossfade(true)
                 .placeholder(R.drawable.default_item_placeholder)

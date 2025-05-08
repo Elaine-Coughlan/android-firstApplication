@@ -14,7 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.elaine.minerecipies.navigation.Login
 import com.elaine.minerecipies.ui.components.AutoCompleteTextField
-import com.elaine.minerecipies.ui.components.InventoryItemRow
+import com.elaine.minerecipies.ui.components.SwipeableInventoryItemRow
 import com.elaine.minerecipies.viewmodel.InventoryViewModel
 
 @Composable
@@ -154,24 +154,31 @@ fun InventoryScreen(
             ) {
                 CircularProgressIndicator()
             }
-        } else if (inventoryList.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Your inventory is empty")
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f)
-            ) {
-                items(inventoryList) { item ->
-                    InventoryItemRow(
-                        item = item,
-                        onDelete = { viewModel.removeItem(item) }
-                    )
+        } else // Updated InventoryScreen.kt
+// Inside the LazyColumn section of your InventoryScreen composable
+
+            if (inventoryList.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Your inventory is empty")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(inventoryList) { item ->
+                        SwipeableInventoryItemRow(
+                            item = item,
+                            items = viewModel.availableItems,
+                            blocks = viewModel.availableBlocks,
+                            onDelete = { viewModel.removeItem(item) }
+                        )
+                    }
                 }
             }
-        }
     }
 }
