@@ -37,6 +37,7 @@ firebaseAuth = "23.2.0"
 firebaseFirestore = "25.1.2"
 
 coilCompose = "2.6.0"
+firebaseStorageKtx = "21.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -90,6 +91,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 
 #Coil
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"}
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

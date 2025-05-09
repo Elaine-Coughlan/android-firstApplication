@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// Remove @HiltViewModel annotation
+
 class RecipeRecommendationsViewModel(
     private val inventoryViewModel: InventoryViewModel,
     private val recipesViewModel: RecipesViewModel

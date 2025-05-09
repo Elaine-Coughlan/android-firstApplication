@@ -24,10 +24,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.elaine.minerecipies.ui.screens.OnboardingScreen
+import com.elaine.minerecipies.ui.screens.UserProfileScreen
+import com.elaine.minerecipies.utils.OnboardingPreferences
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,74 +69,120 @@ fun NavHostProvider(
     paddingValues: PaddingValues,
     authService: AuthService
 ) {
-    // Create a state that will be updated when authentication changes
-    val authState = remember { mutableStateOf(authService.isUserAuthenticatedInFirebase) }
-    // Add an effect that updates the state when auth changes
-    LaunchedEffect(Unit) {
-        // Set up an observer for auth changes
-        authState.value = authService.isUserAuthenticatedInFirebase
+    val context = LocalContext.current
+    val onboardingPreferences = remember { OnboardingPreferences(context) }
+    val hasCompletedOnboardingState = onboardingPreferences.hasCompletedOnboarding.collectAsState(initial = false)
+    val hasCompletedOnboarding = hasCompletedOnboardingState.value
+
+    // Collect the auth state from authService.authStateFlow
+    val isAuthenticatedState = authService.authStateFlow.collectAsState(initial = authService.isUserAuthenticatedInFirebase)
+    val isAuthenticated = isAuthenticatedState.value
+
+    // Determine the start destination based on onboarding status
+    val startDestination = if (hasCompletedOnboarding) Recipes.route else Onboarding.route
+
+    // Debug logging to help verify auth state is working
+    LaunchedEffect(isAuthenticated) {
+        println("Auth state changed: $isAuthenticated")
     }
 
-    // This effect refreshes the auth state after navigation actions
-    LaunchedEffect(navController.currentBackStackEntry) {
-        authState.value = authService.isUserAuthenticatedInFirebase
-    }
     NavHost(
         navController = navController,
-        startDestination = Recipes.route,
+        startDestination = startDestination,  // Use the determined start destination
         modifier = Modifier.padding(paddingValues)
     ) {
+        composable(route = Onboarding.route) {
+            OnboardingScreen(
+                navController = navController,
+                onOnboardingComplete = {
+                    // Mark onboarding as completed and navigate to Recipes
+                    MainScope().launch {
+                        onboardingPreferences.completeOnboarding()
+                    }
+                    navController.navigate(Recipes.route) {
+                        popUpTo(Onboarding.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         // Public screens
         composable(route = Recipes.route) {
             val context = LocalContext.current
             RecipesScreen(context)
         }
+
         // Authentication screens
         composable(route = Login.route) {
-            LoginScreen(
-                navController = navController,
-                onLogin = {
-                    // Update auth state immediately after login
-                    authState.value = true
+            // Only show login screen if not authenticated
+            if (!isAuthenticated) {
+                LoginScreen(
+                    navController = navController,
+                    onLogin = {
+                        // Navigate to Recipes screen after successful login
+                        navController.navigate(Recipes.route) {
+                            popUpTo(Login.route) { inclusive = true }
+                        }
+                    }
+                )
+            } else {
+                // If already authenticated, redirect to Recipes
+                LaunchedEffect(Unit) {
                     navController.navigate(Recipes.route) {
                         popUpTo(Login.route) { inclusive = true }
                     }
                 }
-            )
+            }
         }
 
-
+        composable(route = "profile") {
+            // Ensure user is authenticated for profile screen
+            if (isAuthenticated) {
+                UserProfileScreen(navController = navController)
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Login.route)
+                }
+            }
+        }
 
         composable(route = Register.route) {
-            RegisterScreen(
-                navController = navController,
-                onRegister = {
-                    // Update auth state immediately after registration
-                    authState.value = true
+            // Only show register screen if not authenticated
+            if (!isAuthenticated) {
+                RegisterScreen(
+                    navController = navController,
+                    onRegister = {
+                        navController.navigate(Recipes.route) {
+                            popUpTo(Register.route) { inclusive = true }
+                        }
+                    }
+                )
+            } else {
+                // If already authenticated, redirect to Recipes
+                LaunchedEffect(Unit) {
                     navController.navigate(Recipes.route) {
                         popUpTo(Register.route) { inclusive = true }
                     }
                 }
-            )
+            }
         }
 
         // Auth-required screens
         composable(route = Inventory.route) {
-            // Use the state variable instead of direct call
-            if (authState.value) {
+            if (isAuthenticated) {
                 InventoryScreen(
                     navController = navController
                 )
             } else {
                 // Redirect to login if not logged in
-                LaunchedEffect(true) {
+                LaunchedEffect(Unit) {
                     navController.navigate(Login.route)
                 }
             }
         }
+
         composable(route = RecipeRecommendations.route) {
-            // Use the state variable instead of direct call
-            if (authState.value) {
+            if (isAuthenticated) {
                 val inventoryViewModel: InventoryViewModel = hiltViewModel()
                 val recipesViewModel: RecipesViewModel = hiltViewModel()
 
@@ -138,8 +192,6 @@ fun NavHostProvider(
                     recipesViewModel = recipesViewModel
                 )
 
-
-
                 val recommendationsViewModel: RecipeRecommendationsViewModel = viewModel(factory = factory)
                 RecipeRecommendationsScreen(
                     recommendationsViewmodel = recommendationsViewModel,
@@ -148,10 +200,26 @@ fun NavHostProvider(
                 )
             } else {
                 // Redirect to login if not logged in
-                LaunchedEffect(true) {
+                LaunchedEffect(Unit) {
                     navController.navigate(Login.route)
                 }
             }
+        }
+    }
+
+    //listener to handle auth state changes
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            // Check if the current destination requires authentication
+            val destinationRoute = destination.route
+            if (destinationRoute != null && authRequiredDestinations.any { it.route == destinationRoute } && !isAuthenticated) {
+                navController.navigate(Login.route)
+            }
+        }
+
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
         }
     }
 }

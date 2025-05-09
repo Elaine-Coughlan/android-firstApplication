@@ -26,7 +26,8 @@ class RegisterViewModel @Inject constructor(
             _isLoading.value = true
             _errorMessage.value = null
 
-            val result = authService.createUser(name, email, password)
+            val trimmedEmail = email.trim()
+            val result = authService.createUser(name, trimmedEmail, password)
 
             when (result) {
                 is Response.Success -> {

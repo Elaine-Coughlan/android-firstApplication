@@ -3,6 +3,7 @@ package com.elaine.minerecipies.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -41,6 +42,12 @@ object RecipeRecommendations : AppDestination {
     override val icon = Icons.Filled.Star
     override val label = "Recommendations"
     override val route = "recommendations"
+}
+
+object Onboarding : AppDestination {
+    override val icon = Icons.Filled.Info
+    override val label = "Onboarding"
+    override val route = "onboarding"
 }
 
 val allDestinations = listOf(Recipes, Inventory, RecipeRecommendations)

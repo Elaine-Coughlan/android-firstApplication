@@ -92,4 +92,40 @@ class FirestoreRepository @Inject constructor(
             .delete()
             .await()
     }
+
+    // Add to your FirestoreRepository class
+
+    override suspend fun countUserRecipes(email: String): Int {
+        return try {
+            val snapshot = firestore.collection("recipes")
+                .whereEqualTo("createdBy", email)
+                .get()
+                .await()
+
+            snapshot.size()
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    override suspend fun countCraftableRecipes(email: String): Int {
+        // This would require more implementation based on your specific app logic
+        // For example, comparing user's inventory with available recipes
+        return 0 // Placeholder
+    }
+
+    override suspend fun deleteUserData(email: String) {
+        // Get all documents for this user
+        val snapshot = firestore.collection(INVENTORY_COLLECTION)
+            .whereEqualTo(USER_EMAIL, email)
+            .get()
+            .await()
+
+        // Delete each document
+        for (document in snapshot.documents) {
+            document.reference.delete().await()
+        }
+
+        // You might want to also delete recipes, settings, etc. created by this user
+    }
 }

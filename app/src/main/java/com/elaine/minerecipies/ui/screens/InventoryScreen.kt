@@ -16,34 +16,52 @@ import com.elaine.minerecipies.navigation.Login
 import com.elaine.minerecipies.ui.components.AutoCompleteTextField
 import com.elaine.minerecipies.ui.components.SwipeableInventoryItemRow
 import com.elaine.minerecipies.viewmodel.InventoryViewModel
+import com.elaine.minerecipies.viewmodel.UserProfileViewModel
 
 @Composable
 fun InventoryScreen(
     navController: NavController,
-    viewModel: InventoryViewModel = hiltViewModel()
+    viewModel: InventoryViewModel = hiltViewModel(),
+    userProfileViewModel: UserProfileViewModel = hiltViewModel()
 ) {
     val inventoryList by viewModel.inventoryList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val isAuthenticated by userProfileViewModel.isAuthenticated.collectAsState()
+    val displayName by userProfileViewModel.displayName.collectAsState()
+
 
     val isItemSelected = remember { mutableStateOf(true) }
     val selectedName = remember { mutableStateOf("") }
     val quantity = remember { mutableStateOf("1") }
 
+
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        // Header with login status
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Your Inventory",
+                text = "$displayName's Inventory",
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            IconButton(onClick = { navController.navigate(Login.route) }) {
-                Icon(Icons.Default.Person, contentDescription = "Login")
+// Icon button that navigates to profile if authenticated, otherwise to login
+            IconButton(
+                onClick = {
+                    if (isAuthenticated) {
+                        navController.navigate("profile")
+                    } else {
+                        navController.navigate(Login.route)
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = if (isAuthenticated) "Profile" else "Login"
+                )
             }
         }
 
@@ -154,10 +172,7 @@ fun InventoryScreen(
             ) {
                 CircularProgressIndicator()
             }
-        } else // Updated InventoryScreen.kt
-// Inside the LazyColumn section of your InventoryScreen composable
-
-            if (inventoryList.isEmpty()) {
+        } else if (inventoryList.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
