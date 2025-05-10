@@ -32,7 +32,7 @@ fun GoogleSignInButton(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.google_logo),
+                painter = painterResource(id = R.drawable.ic_google),
                 contentDescription = "Google Logo",
                 modifier = Modifier.size(24.dp)
             )
